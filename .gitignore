@@ -1,4 +1,5 @@
 __pycache__/*
+analytica/__pycache__/*
 venv/
 colors.scheme.xml
 databaseDrivers.xml
@@ -15,3 +16,9 @@ _windows
 codestyles
 analytica/settings.py
 analytica/wsgi.py
+*.log
+*.pot
+*.pyc
+*/*/*/__pycache__/
+*/*/__pycache__/
+*/__pycache__/

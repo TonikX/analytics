@@ -1,5 +1,7 @@
 from django.db import models
 from dataprocessing.models import Items
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 
 class FieldOfStudyWorkProgram(models.Model):
@@ -36,8 +38,8 @@ class PrerequisitesOfWorkProgram(models.Model):
     '''
     Модель для пререквизитов рабочей программы
     '''
-    class Meta:
-        auto_created = True
+    # class Meta:
+    #     auto_created = True
 
     item = models.ForeignKey(Items, on_delete=models.CASCADE)
     workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE)
@@ -57,8 +59,8 @@ class OutcomesOfWorkProgram(models.Model):
     '''
     Модель для результатов обучения по рабочей программе
     '''
-    class Meta:
-        auto_created = True
+    # class Meta:
+    #     auto_created = True
 
     item = models.ForeignKey(Items, on_delete=models.CASCADE)
     workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE)
@@ -73,18 +75,18 @@ class OutcomesOfWorkProgram(models.Model):
         default=1,
     )
 
-
-class User(models.Model):
-    '''
-    Модель для пользователей
-    '''
-    first_name = models.CharField(max_length=1024)
-    last_name = models.CharField(max_length=1024)
-    patronymic = models.CharField(max_length=1024)
-    isu_number = models.CharField(max_length=1024)
-
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name
+#
+# class User(AbstractUser):
+#     '''
+#     Модель для пользователей
+#     '''
+#     first_name = models.CharField(max_length=1024)
+#     last_name = models.CharField(max_length=1024)
+#     patronymic = models.CharField(max_length=1024)
+#     isu_number = models.CharField(max_length=1024)
+#
+#     def __str__(self):
+#         return self.first_name + ' ' + self.last_name
 
 
 class FieldOfStudy(models.Model):
@@ -212,7 +214,7 @@ class RouteComposition(models.Model):
     Модель для состава маршрутов (связь маршрутов и рабочих программ)
     '''
     route = models.ForeignKey('Route', on_delete=models.CASCADE)
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     work_program = models.ForeignKey('WorkProgram', on_delete=models.CASCADE)
     field_of_study = models.ForeignKey('FieldOfStudy', on_delete=models.CASCADE)
     semester = models.PositiveSmallIntegerField()
@@ -225,6 +227,6 @@ class Route(models.Model):
     '''
     Модель для маршрутов
     '''
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     field_of_study = models.ForeignKey('FieldOfStudy', on_delete=models.CASCADE)
     work_programs = models.ManyToManyField('WorkProgram', through=RouteComposition)

@@ -54,10 +54,10 @@ class RelationForm(forms.ModelForm):
  
     """
     item1 = forms.ModelChoiceField(widget = forms.Select(attrs={'class': 'selectpicker','data-live-search':'true'}),
-        label = 'Элементы РПД',initial= Items.objects.order_by("?").first(), 
+        label = 'Элементы РПД',initial= Items.objects.order_by("?").first(),
         queryset=Items.objects.order_by('name'))
-    item2 = forms.ModelMultipleChoiceField(widget = forms.SelectMultiple(attrs={'class': 'selectpicker','data-live-search':'true'}), 
-        label = 'Элементы РПД', initial= Items.objects.order_by("?").first(), 
+    item2 = forms.ModelMultipleChoiceField(widget = forms.SelectMultiple(attrs={'class': 'selectpicker','data-live-search':'true'}),
+        label = 'Элементы РПД', initial= Items.objects.order_by("?").first(),
         queryset=Items.objects.order_by('name'))
     
     class Meta:

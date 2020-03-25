@@ -23,6 +23,7 @@ class Domain(models.Model):
     def __str__(self):
         return self.name
 
+
 class Items(models.Model):
     name = models.CharField(max_length=200, blank=True, verbose_name='Название')
     domain = models.ForeignKey(Domain, null = True, blank = True, help_text='Укажите область', verbose_name='Область знаний',on_delete=models.CASCADE,)
@@ -50,7 +51,3 @@ class Relation(models.Model):
     relation = models.CharField(max_length=10, choices=STATUS_CHOICES, default='1', verbose_name='Связь')
     item2 = models.ManyToManyField(Items, related_name = 'item2', verbose_name='Элемент РПД')
 
-
-
-    
-# Create your models here.

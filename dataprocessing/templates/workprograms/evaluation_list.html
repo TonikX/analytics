@@ -1,0 +1,57 @@
+{% extends "main.html" %}
+{% block title %}Evaluation Tool List{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+       
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+        <div class="col-xl-10 mb-4">
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Фонды оценочных средств</h1>
+                                  <a href = "{% url 'eval_post' %}" type="button" class="btn btn-outline-primary btn-lg">ДОБАВИТЬ</a>
+          </div>
+        </div>
+
+          <div class="row">
+            <!-- Pending Requests Card Example -->
+            {% for eval in evaluation %}
+            <div class="col-xl-10 mb-4">
+            
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <div class="col-md-6">
+
+                      <div class="h3 font-weight-bold text-warning text-uppercase mb-0">
+                          <a href="#">{{ eval.type }}</a>
+                          <sup><a href="{% url 'eval_update' pk=eval.pk %}" type="button" class="btn btn-outline-danger btn-sm"> Редактировать</a></sup>
+                      </div> 
+                      <div class="text-s font-weight-bold text-gray-800 mb-3">
+                      {% for s in eval.sections %}
+                          <br> Номера оцениваемых разделов дисциплины: {{ s }}
+                      {% endfor %}
+                          <br> Наименование оценочного средства: {{ eval.name}}
+                          <br> Описание оценочного средства: {{eval.description}}
+                      </div>
+                    </div>
+                  </div>
+
+              
+
+                </div>
+
+              </div>
+
+            </div>
+
+            </div>
+        {% endfor %}
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+
+{% endblock %}

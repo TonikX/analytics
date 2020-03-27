@@ -1,0 +1,14 @@
+{% extends "main.html" %}
+{% block title %}Работа с ФОСами{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="jumbotron">
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a class="btn btn-secondary" href="{% url 'evaluation' %}" role="button">Назад</a>
+  </form>
+</div></div>
+{% endblock %}

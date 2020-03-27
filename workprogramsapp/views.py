@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
 from django.views import View
-from .models import WorkProgram, OutcomesOfWorkProgram, PrerequisitesOfWorkProgram
-from .forms import WorkProgramOutcomesPrerequisites, PrerequisitesOfWorkProgramForm
+from .models import WorkProgram, OutcomesOfWorkProgram, PrerequisitesOfWorkProgram, EvaluationTool, DisciplineSection
+from .forms import WorkProgramOutcomesPrerequisites, PrerequisitesOfWorkProgramForm, EvaluationToolForm
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -145,4 +145,55 @@ class WorkProgramsEdit(View):
             WorkProgramOP.save()
             return redirect('workprograms')
         return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': WorkProgramOP})
+
+
+# 
+#EvaluationTool Views
+#
+
+class EvaluationToolList(View):
+
+    def get(self, request):
+        evaluation = EvaluationTool.objects.all()
+        result = []
+        for e in evaluation:
+            sections = DisciplineSection.objects.filter(evaluation_tools = e)
+            result.append({'pk': e.pk, 'type': e.type,
+                                          'name': e.name, 'description': e.description, 'sections': sections})
+
+        return render(request, 'workprograms/evaluation_list.html', {'evaluation': result})
+
+
+class EvaluationToolPost(View):
+
+    def get(self, request):
+        form = EvaluationToolForm()
+        return render(request, 'workprograms/EvaluationToolEdit.html', {'form': form})
+
+    def post(self, request):
+        evaluation = EvaluationToolForm(request.POST)
+        if evaluation.is_valid():
+            evaluation.save()
+            return redirect('evaluation')
+        return render(request, 'workprograms/EvaluationToolEdit.html', {'form': evaluation})
+
+class EvaluationToolPostUpdate(View):
+
+    def get(self, request, pk):
+        et_obj = get_object_or_404(EvaluationTool, id=pk)
+        form = EvaluationToolForm(instance=et_obj)
+        return render(request, 'workprograms/EvaluationToolEdit.html', {'form': form})
+
+    def post(self, request, pk):
+        et_obj = get_object_or_404(EvaluationTool, id=pk)
+
+        if request.method == "POST":
+            evaluation = EvaluationToolForm(request.POST, instance=et_obj)
+            if evaluation.is_valid():
+                evaluation.save()
+                return redirect('evaluation')
+        else:
+            evaluation = WorkProgramOutcomesPrerequisites(instance=et_obj)
+        return render(request, 'workprograms/EvaluationToolEdit.html', {'form': evaluation})
+
 

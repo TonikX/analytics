@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import WorkProgram, OutcomesOfWorkProgram, PrerequisitesOfWorkProgram
+from .models import WorkProgram, OutcomesOfWorkProgram, PrerequisitesOfWorkProgram, EvaluationTool
 
 
 class WorkProgramOutcomesPrerequisites(forms.ModelForm):
@@ -28,3 +28,12 @@ class PrerequisitesOfWorkProgramForm(forms.ModelForm):
         model = WorkProgram
         #fields = ('id', 'prerequisites', 'outcomes', 'title')
         fields = '__all__'
+        
+        
+class EvaluationToolForm(forms.ModelForm):
+
+    class Meta:
+        model = EvaluationTool
+        fields = '__all__'        
+        
+

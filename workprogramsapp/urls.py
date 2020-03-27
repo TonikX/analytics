@@ -10,5 +10,10 @@ urlpatterns = [
     #re_path(r'^workprograms/(?P<pk>)/update/', WorkProgramsPostUpdate.as_view(), name='workprograms_update'),
     url(r'^workprograms/(?P<pk>\d+)/update/$', WorkProgramsPostUpdate.as_view(), name='workprograms_update'),
     path('api/wplist/', WorkProgramsListApi.as_view()),
+    #urls for evaluation tools
+    path('evaluationlist/', EvaluationToolList.as_view(), name='evaluation'),
+    path('evaluation/new', EvaluationToolPost.as_view(), name='eval_post'),
+    url(r'^evaluation/(?P<pk>\d+)/update/$', EvaluationToolPostUpdate.as_view(), name='eval_update'),
+   
 
 ]

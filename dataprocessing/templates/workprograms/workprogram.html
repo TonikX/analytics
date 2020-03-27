@@ -1,0 +1,80 @@
+{% extends "main.html" %}
+{% block title %}Work Programs List{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        {% for workprogram in workprograms %}
+        <div class="row">
+            <!-- Pending Requests Card Example -->
+
+                <div class="col-xl-10 mb-4">
+
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                                <div class="col-md-6">
+
+                                    <div class="h3 font-weight-bold text-warning text-uppercase mb-0">
+                                        {{ workprogram.title }}
+
+                                    </div>
+                                    <div class="text-s font-weight-bold text-gray-800 mb-3">
+                                        {% if workprogram.hoursSecondSemester %}
+                                            <br> Семестров: 2
+                                        {% else %}
+                                            <br> Семестров: 1
+                                        {% endif %}
+                                        <br> Количество аудиторных часов:
+                                        <br> 1 семестр: {{ workprogram.hoursFirstSemester }} ч.,
+                                        2 семестр: {{ workprogram.hoursSecondSemester }} ч.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class = "row">
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Пререквизиты <sup><a href="{% url 'workprograms_update' pk=workprogram.pk %}" type="button" class="btn btn-outline-danger btn-sm"> Настроить</a></sup></h6>
+                                        </div>
+                                        <div class="card-body">
+                                            {% for prerequisites_level in workprogram.prerequisites_levels %}
+                                                <p><button type="button" class="btn btn-light"> {{ prerequisites_level.item }}: {{ prerequisites_level.item_level }} уровень </button></p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            <br>
+
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Ожидаемые результаты освоения дисциплины</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            {% for outcomes_level in workprogram.outcomes_levels %}
+                                                <p><button type="button" class="btn btn-light"> {{ outcomes_level.item }}: {{ outcomes_level.item_level }} уровень </button></p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            смсмсм
+                        </div>
+
+                    </div>
+
+                </div>
+
+        </div>
+        <!-- /.container-fluid -->
+        {% endfor %}
+    </div>
+    <!-- End of Main Content -->
+
+
+{% endblock %}

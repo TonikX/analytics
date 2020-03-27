@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import WorkProgramSerializer
+from dataprocessing.models import Items
 
 from dataprocessing.models import Items
 import itertools
@@ -44,8 +45,56 @@ class WorkProgramsList(View):
         return render(request, 'workprograms/workprograms.html', {'workprograms': workprograms_outcomes})
 
 
-class WorkProgramsPost(View):
+# Старая версия редактора рабочей программы
+# class WorkProgramsPost(View):
+#
+#     def get(self, request):
+#         form = WorkProgramOutcomesPrerequisites()
+#         return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': form})
+#
+#     def post(self, request):
+#         WorkProgramOP = WorkProgramOutcomesPrerequisites(request.POST)
+#         if WorkProgramOP.is_valid():
+#             WorkProgramOP.save()
+#             return redirect('workprograms')
+#         return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': WorkProgramOP})
 
+#
+# class WorkProgramsList(View):
+#
+#
+#     def get(self, request):
+#
+#         workprograms = WorkProgram.objects.prefetch_related('outcomes', 'prerequisites')
+#         workprograms_outcomes = []
+#         workprograms_prerequisites = []
+#
+#         for workprogram in workprograms:
+#             outcomes = [item.name for item in workprogram.outcomes.all()]
+#             outcomes_levels = OutcomesOfWorkProgram.objects.values_list('masterylevel').filter(workprogram=workprogram.pk)
+#             outcomes_levels2 = [entry for entry in outcomes_levels]
+#             outcomes_levels3 = []
+#             for outcome in outcomes:
+#                 outcomes_levels3.append({'item': outcome, 'item_level': outcomes_levels2[outcomes.index(outcome)][0]})
+#
+#             prerequisites = [item.name for item in workprogram.prerequisites.all()]
+#             prerequisites_levels2 = [entry for entry in PrerequisitesOfWorkProgram.objects.values_list('masterylevel').filter(
+#                 workprogram=workprogram.pk)]
+#             prerequisites_levels3 = []
+#             for prerequisite in prerequisites:
+#                 prerequisites_levels3.append({'item': prerequisite, 'item_level': prerequisites_levels2[prerequisites.index(prerequisite)][0]})
+#                 workprograms_prerequisites.append({'title': workprogram.title, 'outcomes_levels': outcomes_levels3, })
+#             workprograms_outcomes.append({'pk': workprogram.pk, 'hoursFirstSemester': workprogram.hoursFirstSemester,
+#                                           'hoursSecondSemester': workprogram.hoursSecondSemester, 'title': workprogram.title, 'outcomes_levels': outcomes_levels3,
+#                                           'prerequisites_levels': prerequisites_levels3})
+#
+#         return render(request, 'workprograms/workprogram.html', {'workprograms': workprograms_outcomes})
+
+
+class WorkProgramsPost(View):
+    """
+    Вторая версия редактора рабочих программ
+    """
     def get(self, request):
         form = WorkProgramOutcomesPrerequisites()
         return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': form})
@@ -56,6 +105,66 @@ class WorkProgramsPost(View):
             WorkProgramOP.save()
             return redirect('workprograms')
         return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': WorkProgramOP})
+
+
+class WorkProgramView(View):
+
+    """
+    Вторая версия просмотра программ
+    """
+
+    def get(self, request, pk):
+
+        workprograms = WorkProgram.objects.filter(pk=pk).prefetch_related('outcomes', 'prerequisites')
+        workprogramsall = WorkProgram.objects.filter(pk=pk)
+        workprograms_outcomes = []
+        workprograms_prerequisites = []
+        # for workprogram2 in workprogramsall:
+        #     print workprogram2.prerequisites.all()
+        #print(WorkProgram.objects.all()[0].outcomes.all())
+        items = Items.objects.all()
+
+        print('только что полученная рабочая программа', workprograms)
+        print('dfdf')
+        #print(workprograms.outcomes.all())
+        print(WorkProgram.objects.filter(prerequisites__id=1))
+        print(WorkProgram.objects.all()[0].prerequisites.all())
+        prerequisites_of_workprogram = WorkProgram.objects.all()[0].prerequisites.all()
+        print(prerequisites_of_workprogram[0].pk)
+        prerequisites_levels = PrerequisitesOfWorkProgram.objects.values_list('masterylevel').filter(
+            workprogram=pk, item=prerequisites_of_workprogram[0].pk)
+        print (prerequisites_levels)
+
+        #print(PrerequisitesOfWorkProgram.objects.filter(workprogram = 1))
+        # outcomes = [item.name for item in workprograms.outcomes.all()]
+        # print(outcomes)
+        # outcomes_levels = OutcomesOfWorkProgram.objects.values_list('masterylevel').filter(workprogram=workprogram.pk)
+        # outcomes_levels2 = [entry for entry in outcomes_levels]
+        # outcomes_levels3 = []
+
+        for i in WorkProgram.objects.all()[0].prerequisites.all():
+            print (i)
+
+        for workprogram in workprograms:
+            outcomes = [item.name for item in workprogram.outcomes.all()]
+            outcomes_levels = OutcomesOfWorkProgram.objects.values_list('masterylevel').filter(workprogram=workprogram.pk)
+            outcomes_levels2 = [entry for entry in outcomes_levels]
+            outcomes_levels3 = []
+            for outcome in outcomes:
+                outcomes_levels3.append({'item': outcome, 'item_level': outcomes_levels2[outcomes.index(outcome)][0]})
+
+            prerequisites = [item.name for item in workprogram.prerequisites.all()]
+            prerequisites_levels2 = [entry for entry in PrerequisitesOfWorkProgram.objects.values_list('masterylevel').filter(
+                workprogram=workprogram.pk)]
+            prerequisites_levels3 = []
+            for prerequisite in prerequisites:
+                prerequisites_levels3.append({'item': prerequisite, 'item_level': prerequisites_levels2[prerequisites.index(prerequisite)][0]})
+                workprograms_prerequisites.append({'title': workprogram.title, 'outcomes_levels': outcomes_levels3, })
+            workprograms_outcomes.append({'pk': workprogram.pk, 'hoursFirstSemester': workprogram.hoursFirstSemester,
+                                          'hoursSecondSemester': workprogram.hoursSecondSemester, 'title': workprogram.title, 'outcomes_levels': outcomes_levels3,
+                                          'prerequisites_levels': prerequisites_levels3})
+            print (workprograms_outcomes)
+        return render(request, 'workprograms/workprogram.html', {'workprograms': workprograms_outcomes})
 
 
 class WorkProgramsPostUpdate(View):
@@ -132,19 +241,19 @@ class WorkProgramsListApi(APIView):
         serializer = WorkProgramSerializer(WorkPrograms, many=True)
         return Response(serializer.data)
 
-
-class WorkProgramsEdit(View):
-
-    def get(self, request):
-        form = WorkProgramOutcomesPrerequisites()
-        return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': form})
-
-    def post(self, request):
-        WorkProgramOP = WorkProgramOutcomesPrerequisites(request.POST)
-        if WorkProgramOP.is_valid():
-            WorkProgramOP.save()
-            return redirect('workprograms')
-        return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': WorkProgramOP})
+#
+# class WorkProgramsEdit(View):
+#
+#     def get(self, request):
+#         form = WorkProgramOutcomesPrerequisites()
+#         return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': form})
+#
+#     def post(self, request):
+#         WorkProgramOP = WorkProgramOutcomesPrerequisites(request.POST)
+#         if WorkProgramOP.is_valid():
+#             WorkProgramOP.save()
+#             return redirect('workprograms')
+#         return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': WorkProgramOP})
 
 
 # 

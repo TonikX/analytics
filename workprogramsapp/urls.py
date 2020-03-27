@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.conf.urls import url, include
 from django.urls import path, re_path
 from .views import WorkProgramsList, WorkProgramsPost, WorkProgramsPostUpdate, WorkProgramsListApi
+from .views import EvaluationToolList, EvaluationToolPost, EvaluationToolPostUpdate
+
 
 urlpatterns = [
     path('workprogramslist/', WorkProgramsList.as_view(), name='workprograms'),

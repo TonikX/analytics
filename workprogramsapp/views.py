@@ -132,3 +132,17 @@ class WorkProgramsListApi(APIView):
         serializer = WorkProgramSerializer(WorkPrograms, many=True)
         return Response(serializer.data)
 
+
+class WorkProgramsEdit(View):
+
+    def get(self, request):
+        form = WorkProgramOutcomesPrerequisites()
+        return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': form})
+
+    def post(self, request):
+        WorkProgramOP = WorkProgramOutcomesPrerequisites(request.POST)
+        if WorkProgramOP.is_valid():
+            WorkProgramOP.save()
+            return redirect('workprograms')
+        return render(request, 'workprograms/WorkProgramOutcomesPrerequisitesEdit.html', {'form': WorkProgramOP})
+

@@ -63,7 +63,18 @@
                                 </div>
 
                             </div>
-                            смсмсм
+                            {{ discipline_list }}
+                            {% for discipline in discipline_list   %}
+                                {{ discipline.name }}
+                            {% endfor %}<br>
+                            <br>
+                            <br>
+                            {% for discipline_topics in discipline_topics_list  %}
+                                {% for topic in discipline_topics  %}
+                                    {{ topic.number }}<br>
+                                    <b>{{ topic.discipline_section }}</b><br>
+                                {% endfor %}
+                            {% endfor %}
                         </div>
 
                     </div>

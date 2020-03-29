@@ -63,18 +63,26 @@
                                 </div>
 
                             </div>
-                            {{ discipline_list }}
+                            Разделы <br>
+
                             {% for discipline in discipline_list   %}
-                                {{ discipline.name }}
+                                {{ discipline.name }}<br>
+                                {% for discipline_topics in discipline_topics_list  %}
+                                    {% for topic in discipline_topics  %}
+                                        {%  if topic.discipline_section.pk == discipline.pk %}
+                                            <b>{{ topic.number }}</b><br>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
                             {% endfor %}<br>
                             <br>
-                            <br>
-                            {% for discipline_topics in discipline_topics_list  %}
-                                {% for topic in discipline_topics  %}
-                                    {{ topic.number }}<br>
-                                    <b>{{ topic.discipline_section }}</b><br>
-                                {% endfor %}
-                            {% endfor %}
+                            <b>Цели освоения дисциплины</b> <br>
+                            {{ workprogram_atributes.goals }}<br>
+                            <b>Учебно-методическое и информационное обеспечение дисциплины</b> <br>
+                            {{ workprogram_atributes.list_of_references }}<br>
+                            <b>Методические указания для обучающихся по освоению дисциплины</b><br>
+                            {{ workprogram_atributes.guidelines }}<br>
+
                         </div>
 
                     </div>

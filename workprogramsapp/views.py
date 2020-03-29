@@ -114,7 +114,8 @@ class WorkProgramView(View):
     """
 
     def get(self, request, pk):
-
+        thisworkprogram_for_atributes = WorkProgram.objects.get(pk=pk)
+        print ('thisworkprogram_for_atributes', thisworkprogram_for_atributes.goals)
         thisworkprogram = WorkProgram.objects.filter(pk=pk).prefetch_related('outcomes', 'prerequisites')
         workprograms_outcomes = []
         workprograms_prerequisites = []
@@ -139,18 +140,12 @@ class WorkProgramView(View):
         discipline_section_list = DisciplineSection.objects.filter(work_program_id=pk)
         discipline_topics_list =[]
         for discipline_section in discipline_section_list:
-            print (discipline_section.pk)
-            discipline_topics = Topic.objects.filter(discipline_section_id = discipline_section.pk)
-            print (discipline_topics[0].discipline_section)
-            print (discipline_section.name)
-            print (discipline_section.work_program)
+            discipline_topics = Topic.objects.select_related('discipline_section').filter(discipline_section = discipline_section.pk)
             discipline_topics_list.append(discipline_topics)
-        print (discipline_topics_list)
 
 
 
-
-        return render(request, 'workprograms/workprogram.html', {'workprograms': workprograms_outcomes, 'discipline_list': discipline_section_list,
+        return render(request, 'workprograms/workprogram.html', {'workprogram_atributes':thisworkprogram_for_atributes, 'workprograms': workprograms_outcomes, 'discipline_list': discipline_section_list,
                                                                  'discipline_topics_list': discipline_topics_list,})
 
 

@@ -29,6 +29,8 @@ class WorkProgram(models.Model):
     goals = models.CharField(max_length=1024)
     result_goals = models.CharField(max_length=1024)
     field_of_studies = models.ManyToManyField('FieldOfStudy', through=FieldOfStudyWorkProgram)
+    list_of_references = models.TextField(blank=True, null=True)
+    guidelines = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -38,8 +40,8 @@ class PrerequisitesOfWorkProgram(models.Model):
     '''
     Модель для пререквизитов рабочей программы
     '''
-    class Meta:
-        auto_created = True
+    # class Meta:
+    #     auto_created = True
 
     item = models.ForeignKey(Items, on_delete=models.CASCADE)
     workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE)
@@ -59,8 +61,8 @@ class OutcomesOfWorkProgram(models.Model):
     '''
     Модель для результатов обучения по рабочей программе
     '''
-    class Meta:
-        auto_created = True
+    # class Meta:
+    #     auto_created = True
 
     item = models.ForeignKey(Items, on_delete=models.CASCADE)
     workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE)

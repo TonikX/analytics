@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     # JWT authentication backend library
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
+    'django_tables2',
+    'django_filters',
+    'bootstrap_pagination',
 
 ]
 

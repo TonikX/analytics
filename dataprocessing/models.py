@@ -13,8 +13,8 @@ class User(AbstractUser):
     patronymic = models.CharField(max_length=1024)
     isu_number = models.CharField(max_length=1024)
 
-    # def __str__(self):
-    #     return self.first_name + ' ' + self.last_name
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
 
 
 class Domain(models.Model):
@@ -39,11 +39,10 @@ class Relation(models.Model):
     STATUS_CHOICES = (
         ('0', 'неопределенное'),
         ('1', 'включает в себя'),
-        ('2', 'относится к'),
         ('3', 'является пререквизитом для'),
         ('4', 'имеет пререквизит'),
         ('5', 'тождество'),
-        ('6', 'являются частями одного раздела'),
+        ('6', 'относится к'),
         ('7', 'отсутствует'),
     )
 

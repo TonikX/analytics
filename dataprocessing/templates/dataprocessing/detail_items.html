@@ -32,14 +32,24 @@
               <!-- Basic Card Example -->
               <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">{{rel.get_relation_display}}</h6>
+                {% if rel.relation == '6' %}
+                  <h6 class="m-0 font-weight-bold text-primary">{{rel.get_relation_display}}: "{{rel.item1}}"</h6>
                   <a href="{% url 'edit_relation' pk=rel.pk %}">Редактировать</a>
                 </div>
                 <div class="card-body">
                     <ol>{% for item in rel.item2.all %}
                     <li>{{item}}</li>
                     {% endfor %}</ol>
-              
+                {% else %}
+                    <h6 class="m-0 font-weight-bold text-primary">{{rel.get_relation_display}} </h6>
+                    <a href="{% url 'edit_relation' pk=rel.pk %}">Редактировать</a>
+                    </div>
+                <div class="card-body">
+                    <ol>{% for item in rel.item2.all %}
+                    <li>{{item}}</li>
+                    {% endfor %}</ol>
+
+                {% endif %}
                 </div>
               </div>
 

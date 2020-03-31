@@ -1,8 +1,9 @@
 {% extends "main.html" %}
 {% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
 {% block content %}
 {% if user.is_authenticated %}
-{% if items_list %} 
+
  <div class="d-sm-flex align-items-center justify-content-between mb-4">
       <h1 class="h3 mb-0 text-gray-800">Учебные сущности</h1>
       </div>
@@ -107,45 +108,16 @@
       </div>
     </div>
   </div>
-
           <!-- DataTales Example -->
-          <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Учебные сущности</h6>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                  <thead>
-                <tr>
-                  <th>Название</th>
-                  <th>Область</th>
-                  <th>Важность</th>
-                  <th>Автор</th>
-                </tr>
-              </thead>
-              <tbody>
-              <div class="form-check">
-              {% for item in items_list %}  
-              {% for user in item.domain.user.all %} 
-                {% if user == request.user %} 
-                <tr>
-                <td><a class="btn btn-link" href="{% url 'details' pk=item.pk %}">{{ item.name }}</a></td>
-                 <td>{{item.domain}}</td>
-                 <td>{{item.value}}</td>
-                 <td>{{item.author.get_full_name}}</td>
-                 <td><a class="btn btn-default" href="{% url 'items_delete' pk=item.pk %}"><span class="glyphicon glyphicon-trash"></span></a></td>
-                </tr>
-              </tbody>
-
-              {%endif%}              
-              {% endfor %}
-    {% endfor %}
-            </table>
-          </div>   
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Учебные сущности</h6>
+        </div>
+        <div class="card-body">
+        {% render_table table %}
+ 
 </div>
 </div>
-{% endif %}
 {%else%}    
      <p>Войдите или зарегестрируйтесь, чтобы увидеть эту страницу.</p>
      <p><a href="{% url 'web_login'%}?next={{request.path}}">Войти</a></p>

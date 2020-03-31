@@ -8,9 +8,9 @@ class FieldOfStudyWorkProgram(models.Model):
     '''
     Модель для связи направления и рабочей программы
     '''
-    field_of_study = models.ForeignKey('FieldOfStudy', on_delete=models.CASCADE)
-    work_program = models.ForeignKey('WorkProgram', on_delete=models.CASCADE)
-    competence = models.ForeignKey('Competence', on_delete=models.CASCADE)
+    field_of_study = models.ForeignKey('FieldOfStudy', on_delete=models.CASCADE, verbose_name = 'Образовательная программа')
+    work_program = models.ForeignKey('WorkProgram', on_delete=models.CASCADE, verbose_name = 'Рабочая программа')
+    competence = models.ForeignKey('Competence', on_delete=models.CASCADE, verbose_name = 'Компетенции')
 
     class Meta:
         unique_together = ('competence', 'work_program', 'field_of_study')
@@ -21,14 +21,14 @@ class WorkProgram(models.Model):
     Модель для рабочей программы
     '''
     prerequisites = models.ManyToManyField(Items, related_name='WorkProgramPrerequisites',
-                                           through='PrerequisitesOfWorkProgram', blank=True, null=True)
-    outcomes = models.ManyToManyField(Items, related_name='WorkProgramOutcomes', through='OutcomesOfWorkProgram',)
-    title = models.CharField(max_length=1024)
-    hoursFirstSemester = models.IntegerField(blank=True, null=True)
-    hoursSecondSemester = models.IntegerField(blank=True, null=True)
-    goals = models.CharField(max_length=1024)
-    result_goals = models.CharField(max_length=1024)
-    field_of_studies = models.ManyToManyField('FieldOfStudy', through=FieldOfStudyWorkProgram)
+                                           through='PrerequisitesOfWorkProgram', blank=True, null=True, verbose_name = "Пререквизиты")
+    outcomes = models.ManyToManyField(Items, related_name='WorkProgramOutcomes', through='OutcomesOfWorkProgram', verbose_name = "Постреквизиты")
+    title = models.CharField(max_length=1024, verbose_name = "Название")
+    hoursFirstSemester = models.IntegerField(blank=True, null=True, verbose_name = "Количество часов в 1 семестре")
+    hoursSecondSemester = models.IntegerField(blank=True, null=True, verbose_name = "Количество часов в 2 семестре")
+    goals = models.CharField(max_length=1024, verbose_name = "Цели освоения" )
+    result_goals = models.CharField(max_length=1024, verbose_name = "Результаты освоения" )
+    field_of_studies = models.ManyToManyField('FieldOfStudy', through=FieldOfStudyWorkProgram, verbose_name = "Предметная область")
 
     def __str__(self):
         return self.title
@@ -38,11 +38,11 @@ class PrerequisitesOfWorkProgram(models.Model):
     '''
     Модель для пререквизитов рабочей программы
     '''
-    # class Meta:
-    #     auto_created = True
+    class Meta:
+        auto_created = True
 
-    item = models.ForeignKey(Items, on_delete=models.CASCADE)
-    workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE)
+    item = models.ForeignKey(Items, on_delete=models.CASCADE, verbose_name ="Пререквизит" )
+    workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE, verbose_name = "Рабочая программа")
     MasterylevelChoices = [
         ('1', 'low'),
         ('2', 'average'),
@@ -51,19 +51,20 @@ class PrerequisitesOfWorkProgram(models.Model):
     masterylevel = models.CharField(
         max_length=1,
         choices=MasterylevelChoices,
-        default=1,
+        default=1, verbose_name = "Уровень"
     )
-
+    def __str__(self):
+        return self.item
 
 class OutcomesOfWorkProgram(models.Model):
     '''
     Модель для результатов обучения по рабочей программе
     '''
-    # class Meta:
-    #     auto_created = True
+    class Meta:
+        auto_created = True
 
-    item = models.ForeignKey(Items, on_delete=models.CASCADE)
-    workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE)
+    item = models.ForeignKey(Items, on_delete=models.CASCADE, verbose_name = "Постреквизит")
+    workprogram = models.ForeignKey(WorkProgram, on_delete=models.CASCADE, verbose_name = "Рабочая программа" )
     MasterylevelChoices = [
         ('1', 'low'),
         ('2', 'average'),
@@ -72,7 +73,7 @@ class OutcomesOfWorkProgram(models.Model):
     masterylevel = models.CharField(
         max_length=1,
         choices=MasterylevelChoices,
-        default=1,
+        default=1, verbose_name = "Уровень"
     )
 
 #
@@ -112,9 +113,9 @@ class FieldOfStudy(models.Model):
         (INTERNAL, 'Internal'),
         (EXTRAMURAL, 'Extramural'),
     )
-    number = models.CharField(unique=True, max_length=1024)
-    qualification = models.CharField(choices=QUALIFICATION_CHOICES, max_length=1024)
-    education_form = models.CharField(choices=EDUCATION_FORM_CHOICES, max_length=1024)
+    number = models.CharField(unique=True, max_length=1024, verbose_name = 'Шифр и название ОП')
+    qualification = models.CharField(choices=QUALIFICATION_CHOICES, max_length=1024, verbose_name = 'Квалификация')
+    education_form = models.CharField(choices=EDUCATION_FORM_CHOICES, max_length=1024, verbose_name = 'Форма обучения')
 
     def __str__(self):
         return self.number
@@ -177,9 +178,9 @@ class EvaluationTool(models.Model):
     '''
     Модель для оценочных средств
     '''
-    type = models.CharField(max_length=1024)
-    name = models.CharField(unique=True, max_length=1024)
-    description = models.CharField(max_length=1024)
+    type = models.CharField(max_length=1024, verbose_name = "Тип оценочного средства")
+    name = models.CharField(unique=True, max_length=1024, verbose_name = "Наименование оценочного средства")
+    description = models.CharField(max_length=1024, verbose_name = "Описание")
 
     def __str__(self):
         return self.name
@@ -189,9 +190,9 @@ class DisciplineSection(models.Model):
     '''
     Модель для разделов дисциплин
     '''
-    name = models.CharField(unique=True, max_length=1024)
-    work_program = models.ForeignKey('WorkProgram', on_delete=models.CASCADE)
-    evaluation_tools = models.ManyToManyField('EvaluationTool')
+    name = models.CharField(unique=True, max_length=1024, verbose_name = "Раздел" )
+    work_program = models.ForeignKey('WorkProgram', on_delete=models.CASCADE, verbose_name='Рабочая программа')
+    evaluation_tools = models.ManyToManyField('EvaluationTool', verbose_name='Фонды оценочных средств')
 
     def __str__(self):
         return self.name
@@ -201,9 +202,9 @@ class Topic(models.Model):
     '''
     Модель для темы
     '''
-    discipline_section = models.ForeignKey('DisciplineSection', on_delete=models.CASCADE)
-    number = models.CharField(unique=True, max_length=1024)
-    description = models.CharField(max_length=1024)
+    discipline_section = models.ForeignKey('DisciplineSection', on_delete=models.CASCADE, verbose_name = "Раздел")
+    number = models.CharField(unique=True, max_length=1024, verbose_name = "Номер")
+    description = models.CharField(max_length=1024, verbose_name = "Описание")
 
     def __str__(self):
         return self.number

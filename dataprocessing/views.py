@@ -14,29 +14,40 @@ from django.template import loader, RequestContext
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template.loader import render_to_string
 from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
-
+from django_tables2.paginators import LazyPaginator
+from django_tables2 import SingleTableView, RequestConfig
+from .tables import DomainTable, RelationTable, ItemsTable
 ''' 
     ItemsListView, RelationListView, DomainListView, DataListView 
     classes to generate a list items views 
 '''
 class ItemsListView(View):
     model = Items
+    
     def get(self,request):
-        items_list = Items.objects.order_by('name').all()
+        #items_list = Items.objects.order_by('name').all()
+        table = ItemsTable(Items.objects.all(), order_by="name")
+        #table.paginate(page=request.GET.get("page", 1), per_page=25)
         domain_list = Domain.objects.all()
-        return render(request, 'dataprocessing/items_list.html', {'items_list': items_list, 'domain_list': domain_list})
-        
-
-class RelationListView(generic.ListView):
+        RequestConfig(request, paginate={"paginator_class": LazyPaginator, "per_page": 10}).configure(
+                                                table)
+        return render(request, 'dataprocessing/items_list.html', {"table": table, 'domain_list': domain_list})
+    
+class RelationListView(SingleTableView):
     model = Relation
-    def get_queryset(self):
-        return Relation.objects.all()
+    table_class = RelationTable
+    template_name = 'dataprocessing/relation_list.html'
+    #def get_queryset(self):
+    #    return Relation.objects.all()
 
-class DomainListView(generic.ListView):
+class DomainListView(SingleTableView):
     model = Domain
-    def get_queryset(self):
-        return Domain.objects.all()
-''' 
+    table_class = DomainTable
+    template_name = 'dataprocessing/domain_list.html'
+    #def get_queryset(self):
+    #    return Domain.objects.all()
+
+'''
     index to render the main page  
 '''
 @login_required
@@ -227,11 +238,12 @@ def upload(request):
         if request.method == 'POST':
             data = handle_uploaded_file(request.FILES['file'], str(request.FILES['file'])).splitlines()
             items_list = []
+            
             for i in data:
                 items_list.extend(i.strip().split(', '))
 
             domain_id = Domain.objects.get(name = request.POST.get("domain")).id
-
+            
             for i in items_list:
                 if Items.objects.filter(name = i).exists():
                     continue;
@@ -239,7 +251,9 @@ def upload(request):
                     item = Items(name = i, domain = Domain.objects.get(pk=domain_id),
                         author = request.user, source = 'uploaded')
                     item.save()
+
             if request.POST.get("hierarchy"):
+                print('hi')
                 set_relation(data,"1")
             return redirect('/items/')
     except:
@@ -264,16 +278,23 @@ def set_relation(file, type_relation):
     course = file[0]
     file.remove(file[0])
     section = file[::2]
-    print(type_relation)
+    print(course, section)
+    for t in section:
+        print(Items.objects.get(name = t))
     new_items = [ Items.objects.get(name = t) for t in section ]
     #check whether relation already exist
-
+    print(new_items)
     item_id = Items.objects.get(name = course).id
+    print(item_id)
     rel = Relation(item1 = Items.objects.get(pk=item_id) , relation = type_relation)
     rel.save()
+    print(rel)
     rel.item2.set(new_items)
+    print('OK')
     items_same_parent = rel.item2.all()
+    print('OK-1')
     same_parent_relation_2(items_same_parent)
+    print('OK-2')
 
     data = dict(zip(file[::2],file[1::2]))
     
@@ -299,13 +320,15 @@ def set_relation(file, type_relation):
 """
 
 def same_parent_relation_2(items_same_parent):
-    try:
+    
         for item in items_same_parent:
-            q = items_same_parent.exclude(name = item)
-            item_id = Items.objects.get(name = item).id
-            relation = Relation(item1 = Items.objects.get(pk = item_id), relation = '6')
-            relation.save()
-            relation.item2.set(q) 
-    except:
-        pass
+            try:
+                q = items_same_parent.exclude(name = item)
+                item_id = Items.objects.get(name = item).id
+                relation = Relation(item1 = Items.objects.get(pk = item_id), relation = '6')
+                relation.save()
+                print('ok')
+                relation.item2.set(q) 
+            except:
+                print(item)
 

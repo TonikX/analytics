@@ -1,5 +1,5 @@
 {% extends "main.html" %}
-
+{% load render_table from django_tables2 %}
 {% block content %}
 {% if user.is_staff %}
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -28,46 +28,20 @@
             </div>
 
 </div>
-
-{% if domain_list %}        
-      
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4">
+<div class="card shadow mb-4">
             <div class="card-header py-3">
               <h6 class="m-0 font-weight-bold text-primary">Область знаний</h6>
             </div>
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                  <thead>
-                <tr>
-                  <th></th>
-                  <th>Название</th>
-                  <th>Пользователи</th>
-                </tr>
-              </thead>
-              <tbody>
-              {% for domain in domain_list %}
-                <tr>
-                <td>{{domain.id}}</td>
-                <td><a class="btn btn-link" href="{% url 'edit_domain' pk=domain.pk %}">{{ domain.name }}</a></td>
-                  
-                <td><ol>{% for user in domain.user.all%}
-                <li>{{user}}</li>
-                {% endfor %}</ol></td>
-                  
-                </tr>
-              </tbody>
-              {% endfor %}
-            </table>
-          </div>   
+              {% render_table table %}
+              </div>
+            </div>   
 </div>
-</div>
- 
-{% endif %}      
+
 {%else%}    
      <p>У вас нет прав доступа к этой странице.</p>
      <p><a href="{% url 'web_login'%}?next={{request.path}}">Войти с правами суперпользователя</a></p>
      <p><a href="{% url 'index'%}">Вернуться</a></p>
-{% endif %}       
-{% endblock %}
+{% endif %}  
+{% endblock %}     

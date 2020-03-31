@@ -8,8 +8,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import WorkProgramSerializer
 from dataprocessing.models import Items
-import itertools,pandas,os
+import itertools, pandas, os
 from django.core.paginator import Paginator
+from django_tables2.paginators import LazyPaginator
+from django_tables2 import SingleTableView, RequestConfig
+from .tables import FieldOfStudyWPTable
 # Create your views here.
 def upload_file(request):
     try:
@@ -19,37 +22,52 @@ def upload_file(request):
             print(data.shape)
             for i in range(len(data)):
                 try:
+                    # проверяем если ОП уже существует в БД
                     if FieldOfStudy.objects.filter(number = data['SUBFIELDCODE'][i]+'-'+data['SUBFIELDNAME'][i]).exists():
-                        continue
-                        print('exist')
+                        fs_obj = FieldOfStudy.objects.get(number = data['SUBFIELDCODE'][i]+'-'+data['SUBFIELDNAME'][i]).id
+                        # Проверяем если Дисцпилина уже есть в БД
+                        #
+                        if WorkProgram.objects.filter(title = data['SUBJECT'][i]).exists():
+                            # если да, то записываем в FieldOfStudyWorkProgram
+                            wp_obj = WorkProgram.objects.get(title = data['SUBJECT'][i]).id
+                            fswp_obj = FieldOfStudyWorkProgram(field_of_study = FieldOfStudy.objects.get(id = fs_obj), work_program = WorkProgram.objects.get(id = wp_obj))
+                            fswp_obj.save()
+                        else:
+                            # если нет, то записываем в БД
+                            wp_obj = WorkProgram(title = data['SUBJECT'][i])
+                            wp_obj.save()
+                            wp_obj = WorkProgram.objects.get(title = data['SUBJECT'][i]).id
+                            # Теперь записываем в FieldOfStudyWorkProgram
+                            fswp_obj = FieldOfStudyWorkProgram(field_of_study = FieldOfStudy.objects.get(id = fs_obj), work_program = WorkProgram.objects.get(id = wp_obj))
+                            fswp_obj.save()
                     else:
+                        # Записываем в БД новую ОП
+                        # 
                         fs_obj = FieldOfStudy(number = data['SUBFIELDCODE'][i]+'-'+data['SUBFIELDNAME'][i], 
                             qualification = data['DEGREE'][i],)
                         fs_obj.save()
-                        field_of_study = fs_obj.id
-                        print('Записан', fs_obj.id)
+                        fs_obj = FieldOfStudy.objects.get(number = data['SUBFIELDCODE'][i]+'-'+data['SUBFIELDNAME'][i]).id
+                        # Проверяем если Дисцпилина уже есть в БД
+                        #
+                        if WorkProgram.objects.filter(title = data['SUBJECT'][i]).exists():
+                            # если да, то записываем в FieldOfStudyWorkProgram
+                            # 
+                            workprogram = WorkProgram.objects.get(title = data['SUBJECT'][i]).id
+                            fswp_obj = FieldOfStudyWorkProgram(field_of_study = FieldOfStudy.objects.get(id = fs_obj), work_program = WorkProgram.objects.get(id = wp_obj))
+                            fswp_obj.save()
+
+                        else:
+                            # если нет, то записываем в БД
+                            wp_obj = WorkProgram(title = data['SUBJECT'][i])
+                            wp_obj.save()
+                            
+                            wp_obj = WorkProgram.objects.get(title = data['SUBJECT'][i]).id
+                            # Теперь записываем в FieldOfStudyWorkProgram
+                            fswp_obj = FieldOfStudyWorkProgram(field_of_study = FieldOfStudy.objects.get(id = fs_obj), work_program = WorkProgram.objects.get(id = wp_obj))
+                            fswp_obj.save()
                 except:
-                    print("Error {0} - {1}".format(i, data['SUBFIELDCODE'][i]))
-                    print("Error {0} - {1}".format(i, data['SUBFIELDNAME'][i]))
-                    print("Error {0} - {1}".format(i, data['DEGREE'][i]))
-                try: 
-                    if WorkProgram.objects.filter(title = data['SUBJECT'][i]).exists():
-                        continue;
-                        print('exist')
-                    else:
-                        wp_obj = WorkProgram(title = data['SUBJECT'][i])
-                        wp_obj.save()
-                        workprogram = wp_obj.id
-                        print('Записан', wp_obj.id)
-                except:
-                    print("Error {0} - {1}".format(i, data['SUBJECT'][i]))
-                try:
-                    fswp_obj = FieldOfStudyWorkProgram(field_of_study_id = field_of_study , workprogram_id = WorkProgram.objects.get(id = workprogram))
-                    fswp_obj.save()
-                except:
-                    print("Error {0} - {1}".format(field_of_study,workprogram))
-            print('successed')
-        return redirect('/workprogramslist/')
+                    pass
+        return redirect('/fswp/')
     except:
         print("Что-то не так")
     return redirect('/workprogramslist/')
@@ -64,6 +82,17 @@ def handle_uploaded_file(file, filename):
     df = pandas.read_csv(path, sep=';', encoding = 'windows-1251')
     df = df.drop(df.columns[[0]], axis=1)
     return df
+
+class FieldOfStudyWPListView(View):
+    model = FieldOfStudyWorkProgram
+    
+    def get(self,request):
+        table = FieldOfStudyWPTable(FieldOfStudyWorkProgram.objects.all(), order_by="name")
+        RequestConfig(request, paginate={"paginator_class": LazyPaginator, "per_page": 30}).configure(
+                                                table)
+        return render(request, 'workprograms/fswp_list.html', {"table": table})
+    
+
 
 class WorkProgramsList(View):
 
@@ -92,7 +121,7 @@ class WorkProgramsList(View):
                                           'hoursSecondSemester': workprogram.hoursSecondSemester, 'title': workprogram.title, 'outcomes_levels': outcomes_levels3,
                                           'prerequisites_levels': prerequisites_levels3})
 
-        paginator = Paginator(workprograms_outcomes, 10) # Show 25 contacts per page
+        paginator = Paginator(workprograms_outcomes, 10) # Show 10 items per page
         page = request.GET.get('page')
         workprograms = paginator.get_page(page)
         return render(request, 'workprograms/workprograms.html', {'workprograms': workprograms})
@@ -240,7 +269,10 @@ class EvaluationToolList(View):
             result.append({'pk': e.pk, 'type': e.type,
                                           'name': e.name, 'description': e.description, 'sections': sections})
 
-        return render(request, 'workprograms/evaluation_list.html', {'evaluation': result})
+        paginator = Paginator(result, 10) # Show 25 contacts per page
+        page = request.GET.get('page')
+        evaluation = paginator.get_page(page)
+        return render(request, 'workprograms/evaluation_list.html', {'evaluation': evaluation})
 
 
 class EvaluationToolPost(View):
@@ -285,7 +317,10 @@ class DisciplineSectionList(View):
             topic = Topic.objects.filter(discipline_section = e)
             section.append({'pk': e.pk, 'name': e.name, 'work_program': e.work_program,'evaluation_tools': e.evaluation_tools, 'topic': topic})
         
-        return render(request, 'workprograms/sections_list.html', {'section': section})
+        paginator = Paginator(section, 25) # Show 25 contacts per page
+        page = request.GET.get('page')
+        sections = paginator.get_page(page)
+        return render(request, 'workprograms/sections_list.html', {'section': sections})
 
 
 class DiscplineSectionPost(View):
@@ -325,6 +360,9 @@ class TopicList(View):
 
     def get(self, request):
         topic = Topic.objects.all()
+        paginator = Paginator(topic, 25) # Show 25 contacts per page
+        page = request.GET.get('page')
+        topic = paginator.get_page(page)
         return render(request, 'workprograms/topics_list.html', {'topic': topic})
 
 

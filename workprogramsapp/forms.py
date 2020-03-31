@@ -1,7 +1,17 @@
 from django import forms
 
-from .models import WorkProgram, OutcomesOfWorkProgram, OutcomesOfWorkProgram, PrerequisitesOfWorkProgram, EvaluationTool, DisciplineSection, Topic
+from .models import WorkProgram, OutcomesOfWorkProgram, OutcomesOfWorkProgram, PrerequisitesOfWorkProgram, EvaluationTool, DisciplineSection, Topic, FieldOfStudyWorkProgram
 
+class FieldOfStudyWorkProgram(forms.ModelForm):
+    class Meta:
+        model = FieldOfStudyWorkProgram
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)  
+        self.fields['field_of_study'].widget.attrs.update({'class': 'selectpicker','data-live-search':'true'})    
+        self.fields['work_program'].widget.attrs.update({'class': 'selectpicker','data-live-search':'true'})    
+        self.fields['competence'].widget.attrs.update({'class': 'selectpicker','data-live-search':'true'})    
 
 class WorkProgramOutcomesPrerequisites(forms.ModelForm):
     
@@ -44,7 +54,7 @@ class OutcomesOfWorkProgramForm(forms.ModelForm):
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
     file = forms.FileField()
-    
+
 class EvaluationToolForm(forms.ModelForm):
 
     class Meta:

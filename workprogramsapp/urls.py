@@ -5,8 +5,7 @@ from .views import WorkProgramsList, WorkProgramsPost, WorkProgramsPostUpdate, W
 from .views import EvaluationToolList, EvaluationToolPost, EvaluationToolPostUpdate
 from .views import DisciplineSectionList, DiscplineSectionPost, DisciplineSectionPostUpdate
 from .views import TopicList, TopicPost, TopicPostUpdate
-from .views import PrerequisitesUpdate, OutcomesUpdate, upload_file
-
+from .views import PrerequisitesUpdate, OutcomesUpdate, upload_file, FieldOfStudyWPListView
 
 
 urlpatterns = [
@@ -14,6 +13,8 @@ urlpatterns = [
     url(r'^workprogram/(?P<pk>\d+)/$', WorkProgramView.as_view(), name='workprogram'),
     path('workprograms/newbinding', WorkProgramsPost.as_view(), name='author_update'),
     url(r'^uploadcsv/$', upload_file, name = 'uploadcsv'),
+    url(r'^fswplist/$', FieldOfStudyWPListView.as_view(), name = 'fswp'),
+
     #ToDo: сделать нормально.
     #re_path(r'^workprograms/(?P<pk>)/update/', WorkProgramsPostUpdate.as_view(), name='workprograms_update'),
     url(r'^workprograms/(?P<pk>\d+)/update/$', WorkProgramsPostUpdate.as_view(), name='workprograms_update'),

@@ -6,36 +6,32 @@
 {% block content %}
   
         <!-- Begin Page Content -->
-        <div class="container-fluid">
-        <div class="container">
-        <div class="col-xl-12 mb-4">
-          <!-- Page Heading -->
-          <div class="row">
-              <div class="col-md mb-4">
-                <h1 class="h3 text-gray-800">Каталог рабочих программ дисциплин</h1>
-              </div>
-              <div class="col-sm">
-                
-              </div>
-              <div class="col-sm">
-                <br>
-                <a data-toggle="modal" data-target="#Modal" type="button" class="btn btn-outline-primary btn-lg">ЗАГРУЗИТЬ CSV</a>
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">КАТАЛОГ РАБОЧИХ ПРОГРАММ ДИСЦИПЛИН</h1>
+                <div class="col-md-4">
+                <a href='#' data-toggle="modal" data-target="#Modal" type="button" class="btn btn-outline-primary btn-lg">ЗАГРУЗИТЬ CSV</a>
                 <a href = "{% url 'author_update' %}" type="button" class="btn btn-outline-primary btn-lg">ДОБАВИТЬ</a>
-              </div>
-            </div>
-            </div>
-          
-        </div>
+                </div>
+          </div>
 <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="JsonModalLabel">Загрузите файл с ключевыми словами</h5>
+          <h5 class="modal-title" id="ModalLabel">Загрузите csv-file</h5>
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
         <div class="modal-body"><b>Формат загружаемого файла:</b>
+           <ol>
+           <li>#</li>
+           <li>SUBFIELDCODE – Шифр ОП</li>
+           <li>SUBFIELDNAME – Наименование ОП</li>
+           <li>DEGREE – Квалификация</li>
+           <li>SUBJECT – Дисциплина</li>
+           <li>SEMESTER – Семестр</li>
+           <li>START_YEAR – Год реализации</li>
+           </ol>
         <form action="/uploadcsv/" method="POST" enctype="multipart/form-data" role="form">
             {% csrf_token %}
             <br>
@@ -59,7 +55,7 @@
               <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                   <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <div class="col-md-6">
+                    <div class="col-md-10">
 
                       <div class="h3 font-weight-bold text-warning text-uppercase mb-0">
                           <a href="{% url 'workprogram' pk=workprogram.pk %}">{{ workprogram.title }}</a>
@@ -112,11 +108,12 @@
             </div>
 
             </div>
+           
+
         {% endfor %}
         </div>
         <!-- /.container-fluid -->
-{% bootstrap_paginate workprograms range=10 show_prev_next="true" show_first_last="true" %} 
-
+ {% bootstrap_paginate workprograms range=10 show_prev_next="true" show_first_last="true" %} 
       </div>
       <!-- End of Main Content -->
 

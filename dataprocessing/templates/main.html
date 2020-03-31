@@ -52,49 +52,49 @@
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Главная</span></a>
       </li>
-
+{% if user.is_authenticated %}
       <!-- Divider -->
       <hr class="sidebar-divider">
 
       <!-- Heading -->
       <div class="sidebar-heading">
         Разделы
-      </div>
-      {% if user.is_authenticated %} 
-      <!-- Nav Item - Charts -->
+      </div> 
+      <!-- Nav Item - Pages Collapse Menu -->
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'domain' %}">
-          <i class="fas fa-fw fa-university"></i>
-          <span>Область знаний</span></a>
-      </li>
-      <!-- Nav Item - Charts -->
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'items' %}">
-          <i class="fas fa-fw fa-list"></i>
-          <span>Учебные сущности</span></a>
-      </li>
-
-      <!-- Nav Item - Tables -->
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'relation' %}">
-          <i class="fas fa-fw fa-sitemap"></i>
-          <span>Связи</span></a>
-      </li>
-      <!-- Divider -->
-      <hr class="sidebar-divider">
-
-      <!-- Heading -->
-      <div class="sidebar-heading">
-        
-      </div>
-      {% if user.is_staff %} 
-      <!-- Nav Item - Charts -->
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'workprograms' %}">
-          <i class="fas fa-fw fa-university"></i>
-          <span>Управление РПД</span></a>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+          <span>Компоненты</span>
+        </a>
+        {% if user.is_staff %}
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Разделы:</h6>
+            <a class="collapse-item" href="{% url 'domain' %}">Предметная область</a>
+            <a class="collapse-item" href="{% url 'items' %}">Учебные сущности</a>
+            <a class="collapse-item" href="{% url 'relation' %}">Связи</a>
+          </div>
+        </div>
       </li>
       {% endif %}
+
+      <!-- Nav Item - Utilities Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+          <span>Компоненты РПД</span>
+        </a>
+        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Управление РПД:</h6>
+            <a class="collapse-item" href="{% url 'workprograms' %}">Каталог РПД</a>
+            <a class="collapse-item" href="{% url 'fswp' %}">Каталог ОП</a>
+            <a class="collapse-item" href="{% url 'section' %}">Каталог разделов</a>
+            <a class="collapse-item" href="{% url 'topic' %}">Каталог тем</a>
+          </div>
+        </div>
+      </li>
+
+
+
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
 
